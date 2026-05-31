@@ -1,6 +1,7 @@
 import type { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import bcrypt from "bcrypt";
 import type { RegisterUserInput } from "./auth.types.ts";
+import  {AppError} from '../../errors/app.error.ts';
 
 export async function registerUser(
     db: Pool,
@@ -18,7 +19,10 @@ export async function registerUser(
     );
 
     if(existingUsers.length > 0) {
-        throw new Error("Email already exists");
+        throw new AppError(
+            409,
+            "Email already exists"
+        );
     }
 
     const passwordHash = await bcrypt.hash(password,10);

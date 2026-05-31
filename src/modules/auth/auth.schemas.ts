@@ -10,3 +10,15 @@ export const registerSchema = {
         additionalProperties: false,
     }
 } as const;
+
+export const loginSchema = {
+    body: {
+        type: "object",
+        required: ["email", "password"],
+        properties:{
+            email: {type: "string", format: "email"},
+            password: {type: "string", minLength: 8, maxLength: 72},
+        },
+        additionalProperties: false,
+    },
+} as const;
