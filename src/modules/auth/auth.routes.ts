@@ -1,6 +1,6 @@
 import type{ FastifyInstance } from "fastify";
 import { registerSchema, loginSchema } from "./auth.schemas.ts";
-import { registerUser, loginUser, refreshAccessToken, } from "./auth.service.ts";
+import { registerUser, loginUser, refreshAccessToken, logoutUser} from "./auth.service.ts";
 import { AppError } from "../../errors/app.error.ts";
 
 export async function authRoutes(app: FastifyInstance) {
@@ -69,4 +69,18 @@ export async function authRoutes(app: FastifyInstance) {
             data: result
         }
     })
+
+    app.post("/api/v1/auth/logout",
+        async (request, reply) => {
+            const refreshToken = request.cookies.refreshToken;
+
+            if(refreshToken){
+                await logoutUser(
+                    app,
+                    refreshToken,
+                );
+            }
+            return reply.status(204).send();
+        }
+    )
 }

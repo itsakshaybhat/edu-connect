@@ -2,10 +2,10 @@ import Fastify from 'fastify';
 import databasePlugin from "./plugins/database.ts";
 import jwtPlugin from "./plugins/jwt.ts";
 import cookiePlugin from "./plugins/cookie.ts";
+import authPlugin from "./plugins/auth.ts";
 import {authRoutes} from "./modules/auth/auth.routes.ts";
 import errorHandlerPlugin from "./plugins/error-handler.ts";
-import {healthRoutes,jwtTestRoute} from "./modules/health/routes.ts";
-
+import {healthRoutes,jwtTestRoute,authenticateRoute,authorizeMiddleware} from "./modules/health/routes.ts";
 
 export function buildApp() {
     const app = Fastify({logger: true});
@@ -16,13 +16,19 @@ export function buildApp() {
 
     app.register(jwtPlugin);
 
-    app.register(errorHandlerPlugin)
+    app.register(errorHandlerPlugin);
+
+    app.register(authPlugin);
 
     app.register(healthRoutes);
+
+    app.register(authenticateRoute);
 
     app.register(jwtTestRoute);
 
     app.register(authRoutes);
+
+    app.register(authorizeMiddleware);
 
     return app;
 }

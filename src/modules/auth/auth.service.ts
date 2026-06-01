@@ -195,4 +195,20 @@ export async function refreshAccessToken(
     return {
         accessToken,
     };
+
+
+}
+
+export async function logoutUser (
+    app: FastifyInstance,
+    refreshToken: string
+) {
+    await app.db.execute<ResultSetHeader>(
+        `
+        DELETE FROM refresh_tokens
+        WHERE token=?
+        `,
+        [refreshToken]
+
+    );
 }
