@@ -8,7 +8,7 @@ import {healthRoutes,jwtTestRoute} from "./modules/health/routes.ts";
 
 
 export function buildApp() {
-    const app = Fastify();
+    const app = Fastify({logger: true});
 
     app.register(databasePlugin);
 

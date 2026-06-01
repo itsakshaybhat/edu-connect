@@ -1,6 +1,7 @@
 import type{ FastifyInstance } from "fastify";
-import { registerSchema } from "./auth.schemas.ts";
-import { registerUser } from "./auth.service.ts";
+import { registerSchema, loginSchema } from "./auth.schemas.ts";
+import { registerUser, loginUser, refreshAccessToken, } from "./auth.service.ts";
+import { AppError } from "../../errors/app.error.ts";
 
 export async function authRoutes(app: FastifyInstance) {
     app.post("/api/v1/auth/register",{
@@ -19,4 +20,53 @@ export async function authRoutes(app: FastifyInstance) {
             data: user,
         });
     });
+
+    app.post("/api/v1/auth/login",{
+        schema: loginSchema,
+    }, async (request, reply)=>{
+        const result = await loginUser(
+            app,
+            request.body as {
+                email: string;
+                password: string;
+            }
+        );
+        reply.setCookie(
+            "refreshToken",
+            result.refreshToken,
+            {
+                httpOnly: true,
+                path: "/",
+                sameSite: "strict",
+                secure: false,
+            }
+        );
+
+        return {
+            success: true,
+            data: {
+                accessToken: result.accessToken,
+            }
+        }
+    });
+
+    app.post("/api/v1/auth/refresh", async(request, reply)=>{
+        const refreshToken = request.cookies.refreshToken;
+
+        if(!refreshToken){
+            throw new AppError(
+                401,
+                "Refresh token missing"
+            );
+        }
+        const result = await refreshAccessToken(
+            app,
+            refreshToken
+        );
+
+        return {
+            success: true,
+            data: result
+        }
+    })
 }

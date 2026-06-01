@@ -8,12 +8,25 @@ export function generateAccessToken(
 ) {
     return app.jwt.sign(
         {
-            sub: userId,
+            userId,
             role,
         },
         {
-            secret: env.JWT_ACCESS_SECRET,
             expiresIn: env.JWT_ACCESS_EXPIRES_IN,
         }
     )
+}
+
+export function generateRefreshToken(
+    app: FastifyInstance,
+    userId: number
+) {
+    return app.jwt.sign (
+        {
+            userId,
+        },
+        {
+            expiresIn: env.JWT_REFRESH_EXPIRES_IN,
+        }
+    );
 }
