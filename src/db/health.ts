@@ -5,7 +5,7 @@ const connection = await pool.getConnection();
 
 try{
     await connection.ping();
-    console.log("Database connected");
+    console.log("\nDatabase Connected Successfully\n");
 } catch (error) {
     console.log(`The database connection error ${error}`);
     console.error(error);
