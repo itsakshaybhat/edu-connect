@@ -3,17 +3,22 @@ import databasePlugin from "./plugins/database.ts";
 import jwtPlugin from "./plugins/jwt.ts";
 import cookiePlugin from "./plugins/cookie.ts";
 import authPlugin from "./plugins/auth.ts";
-import {authRoutes} from "./modules/auth/auth.routes.ts";
+import { authRoutes } from "./modules/auth/auth.routes.ts";
 import errorHandlerPlugin from "./plugins/error-handler.ts";
-import {healthRoutes,
-        jwtTestRoute,
-        authenticateRoute,
-        authorizeMiddleware} from "./modules/health/routes.ts";
-import {profileRoutes} from "./modules/profile/profile.routes.ts";
-import {courseRoutes} from "./modules/courses/course.routes.ts";
+import {
+    healthRoutes,
+    jwtTestRoute,
+    authenticateRoute,
+    authorizeMiddleware
+} from "./modules/health/routes.ts";
+import { profileRoutes } from "./modules/profile/profile.routes.ts";
+import { courseRoutes } from "./modules/courses/course.routes.ts";
+import { enrollmentRoutes } from "./modules/enrollment/enrollment.routes.ts";
+
+
 
 export function buildApp() {
-    const app = Fastify({logger: true});
+    const app = Fastify({ logger: true });
 
     app.register(databasePlugin);
 
@@ -22,7 +27,6 @@ export function buildApp() {
     app.register(authPlugin);
 
     app.register(errorHandlerPlugin);
-   
 
     app.register(courseRoutes);
     app.register(authenticateRoute);
@@ -30,6 +34,7 @@ export function buildApp() {
     app.register(healthRoutes);
     app.register(profileRoutes);
     app.register(authRoutes);
+    app.register(enrollmentRoutes);
     app.register(authorizeMiddleware);
 
     return app;

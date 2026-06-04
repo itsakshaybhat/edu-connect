@@ -14,7 +14,4 @@ export interface AuthUser {
   role: string;
 }
 
-export interface AuthUser {
-  userId: number;
-  role: string;
-}
+

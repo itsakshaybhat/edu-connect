@@ -39,3 +39,29 @@ export const listCourseSchema = {
         },
     },
 } as const;
+
+export const updateCourseSchema = {
+    params: {
+        type: "object",
+        required: ["id"],
+        properties: {
+            id: {type: "integer", minimum: 1,},
+        },
+    },
+    body:{
+        type: "object",
+        properties: {
+            title: {
+                type: "string",
+                minLength: 3,
+                maxLength: 255,
+            },
+            description:{
+                type: "string",
+                maxLength: 5000,
+            }
+        },
+        additionalProperties: false,
+        minProperties: 1,
+    }
+} as const;

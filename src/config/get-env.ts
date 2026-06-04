@@ -6,3 +6,4 @@ export function getEnv(name: string): string {
     }
     return value;
 }
+

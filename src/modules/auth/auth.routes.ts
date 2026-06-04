@@ -1,12 +1,12 @@
-import type{ FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { registerSchema, loginSchema } from "./auth.schemas.ts";
-import { registerUser, loginUser, refreshAccessToken, logoutUser} from "./auth.service.ts";
+import { registerUser, loginUser, refreshAccessToken, logoutUser } from "./auth.service.ts";
 import { AppError } from "../../errors/app.error.ts";
 
 export async function authRoutes(app: FastifyInstance) {
-    app.post("/api/v1/auth/register",{
+    app.post("/api/v1/auth/register", {
         schema: registerSchema,
-    }, async(request, reply)=>{
+    }, async (request, reply) => {
         const user = await registerUser(
             app.db,
             request.body as {
@@ -21,9 +21,9 @@ export async function authRoutes(app: FastifyInstance) {
         });
     });
 
-    app.post("/api/v1/auth/login",{
+    app.post("/api/v1/auth/login", {
         schema: loginSchema,
-    }, async (request, reply)=>{
+    }, async (request, reply) => {
         const result = await loginUser(
             app,
             request.body as {
@@ -46,14 +46,15 @@ export async function authRoutes(app: FastifyInstance) {
             success: true,
             data: {
                 accessToken: result.accessToken,
+                refreshToken: result.refreshToken,
             }
         }
     });
 
-    app.post("/api/v1/auth/refresh", async(request, reply)=>{
+    app.post("/api/v1/auth/refresh", async (request, reply) => {
         const refreshToken = request.cookies.refreshToken;
 
-        if(!refreshToken){
+        if (!refreshToken) {
             throw new AppError(
                 401,
                 "Refresh token missing"
@@ -74,7 +75,7 @@ export async function authRoutes(app: FastifyInstance) {
         async (request, reply) => {
             const refreshToken = request.cookies.refreshToken;
 
-            if(refreshToken){
+            if (refreshToken) {
                 await logoutUser(
                     app,
                     refreshToken,

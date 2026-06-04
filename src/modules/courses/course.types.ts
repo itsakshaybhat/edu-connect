@@ -10,3 +10,8 @@ export interface ListCourseQuery {
     sortBy?: "createdAt" | "title";
     order?: "asc" | "desc";
 }
+
+export interface UpdateCourseInput {
+    title?: string;
+    description?:string;
+}

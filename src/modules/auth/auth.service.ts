@@ -2,23 +2,24 @@ import type { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import bcrypt from "bcrypt";
 import type { FastifyInstance } from "fastify";
 import type { RegisterUserInput } from "./auth.types.ts";
-import  {AppError} from '../../errors/app.error.ts';
+import { AppError } from '../../errors/app.error.ts';
 import type { LoginUserInput } from "./auth.types.ts";
-import { generateAccessToken, 
-         generateRefreshToken,
+import {
+    generateAccessToken,
+    generateRefreshToken,
 } from "./token.service.ts";
 
 interface UserRow extends RowDataPacket {
     id: number;
-    // email: string;
-    // password_hash: string;
+    email: string;
+    password_hash: string;
     role: string;
 }
 
 export async function registerUser(
     db: Pool,
     input: RegisterUserInput,
-){
+) {
     const { name, email, password } = input;
 
     const [existingUsers] = await db.query<RowDataPacket[]>(
@@ -30,14 +31,14 @@ export async function registerUser(
         [email]
     );
 
-    if(existingUsers.length > 0) {
+    if (existingUsers.length > 0) {
         throw new AppError(
             409,
             "Email already exists"
         );
     }
 
-    const passwordHash = await bcrypt.hash(password,10);
+    const passwordHash = await bcrypt.hash(password, 10);
 
     const [result] = await db.execute<ResultSetHeader>(
         `
@@ -50,14 +51,14 @@ export async function registerUser(
         )
         VALUES (?,?,?,?)
         `,
-        [name,email,passwordHash,"student"]
+        [name, email, passwordHash, "student"]
     );
     return {
         id: result.insertId,
     };
 }
 
-export async function loginUser(app: FastifyInstance, input:LoginUserInput){
+export async function loginUser(app: FastifyInstance, input: LoginUserInput) {
     const { email, password } = input;
 
     const [users] = await app.db.query<UserRow[]>(
@@ -73,17 +74,20 @@ export async function loginUser(app: FastifyInstance, input:LoginUserInput){
         `,
         [email]
     );
+
     const user = users[0];
-    if(!user) {
+
+    if (!user) {
         throw new AppError(401, "Invalid Credentials");
     }
+    
     const passwordMatches = await bcrypt.compare(
         password,
         user.password_hash
     );
 
-    if(!passwordMatches){
-        throw new AppError(401,"Invalid Credentials");
+    if (!passwordMatches) {
+        throw new AppError(401, "Invalid Credentials");
     }
 
     const accessToken = generateAccessToken(
@@ -130,10 +134,10 @@ export async function refreshAccessToken(
     app: FastifyInstance,
     refreshToken: string
 ) {
-    let payload: {userId: number};
+    let payload: { userId: number };
 
-    try{
-        payload = app.jwt.verify<{userId: number}>(
+    try {
+        payload = app.jwt.verify<{ userId: number }>(
             refreshToken
         );
     } catch (error) {
@@ -159,7 +163,7 @@ export async function refreshAccessToken(
 
     const storedToken = tokens[0];
 
-    if(!storedToken) {
+    if (!storedToken) {
         throw new AppError(
             401,
             "Invalid refresh token"
@@ -180,7 +184,7 @@ export async function refreshAccessToken(
 
     const user = users[0];
 
-    if(!user) {
+    if (!user) {
         throw new AppError(
             401,
             "Invalid refresh token"
@@ -199,7 +203,7 @@ export async function refreshAccessToken(
 
 }
 
-export async function logoutUser (
+export async function logoutUser(
     app: FastifyInstance,
     refreshToken: string
 ) {
