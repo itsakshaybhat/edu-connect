@@ -162,7 +162,7 @@ export async function updateLesson(
     input: UpdateLessonInput,
 ) {
     const updates: string[] = [];
-    const values: unknown[] = [];
+    const values: (string | number | null)[] = [];
 
     if (input.title !== undefined) {
         updates.push("title = ?");
