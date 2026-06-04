@@ -1,22 +1,33 @@
 import { buildApp } from './app.ts';
 import { env } from './config/env.ts';
+import {pool} from "./db/pool.ts";
 
 import { checkDatabaseConnection } from './db/health.ts';
 
-const start = async () =>{
-    await checkDatabaseConnection();
+const start = async () => {
+    try {
+        await checkDatabaseConnection();
 
-    const app = buildApp();
+        const app = buildApp();
+        await app.listen({ port: env.PORT })
+        console.log(`\nServer Started at http://localhost:${env.PORT}\n`);
 
-    await app.listen({
-        port: env.PORT,
-    }, (err, address)=>{
-        if(err){
-            console.error(err);
+        process.on("SIGINT", async () => {
+            console.log("Closing DB pool...");
+            await pool.end();
             process.exit(0);
-        }
-        console.log(`\nServer Started at ${address}\n`);
-    })
+        }); //Signal Interupt
+
+        process.on("SIGTERM", async () => {
+            console.log("Closing DB pool...");
+            await pool.end();
+            process.exit(0);
+        }); //Signal Termination
+        
+    } catch (error) {
+        console.error("Failed to start Server", error);
+        process.exit(1);
+    }
 }
 
 start();

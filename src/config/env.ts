@@ -1,11 +1,8 @@
 import dotenv from "dotenv";
-import path from "node:path";
 import { getEnv } from "./get-env.ts";
 import { getNumberEnv } from "./get-number-env.ts";
 
-dotenv.config({
-    path: path.resolve(process.cwd(), "src", ".env"),
-});
+dotenv.config();
 
 export const env = {
     PORT: getNumberEnv("PORT") || 3000,
