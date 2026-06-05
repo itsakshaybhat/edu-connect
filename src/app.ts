@@ -7,7 +7,7 @@ import { authRoutes } from "./modules/auth/auth.routes.ts";
 import errorHandlerPlugin from "./plugins/error-handler.ts";
 import {
     healthRoutes,
-    jwtTestRoute,
+    jwtTestRoute, 
     authenticateRoute,
     authorizeMiddleware
 } from "./modules/health/routes.ts";
@@ -21,12 +21,20 @@ export function buildApp() {
     const app = Fastify({ logger: true });
 
     app.register(databasePlugin);
-
     app.register(cookiePlugin);
     app.register(jwtPlugin);
     app.register(authPlugin);
-
     app.register(errorHandlerPlugin);
+
+//  const plugins = [
+//     databasePlugin,
+//     cookiePlugin,
+//     jwtPlugin,
+//     authPlugin,
+//     errorHandlerPlugin
+// ];
+
+// plugins.forEach(plugin => app.register(plugin));
 
     app.register(courseRoutes);
     app.register(authenticateRoute);
