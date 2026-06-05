@@ -6,7 +6,7 @@ import type { ListCourseQuery } from "./course.types.ts";
 import type { AuthUser } from "../auth/auth.types.ts";
 
 interface CourseRow extends RowDataPacket {
-    id: number;
+    id: number; 
     instructor_id: number;
     title: string;
     description: string;

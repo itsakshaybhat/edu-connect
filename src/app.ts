@@ -14,6 +14,7 @@ import {
 import { profileRoutes } from "./modules/profile/profile.routes.ts";
 import { courseRoutes } from "./modules/courses/course.routes.ts";
 import { enrollmentRoutes } from "./modules/enrollment/enrollment.routes.ts";
+import { lessonRoutes } from "./modules/lessons/lesson.routes.ts";
 
 
 
@@ -45,6 +46,7 @@ export function buildApp() {
     app.register(authRoutes);
     app.register(enrollmentRoutes);
     app.register(courseRoutes);
+    app.register(lessonRoutes);
 
 
     return app;

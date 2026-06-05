@@ -10,13 +10,12 @@ export async function healthRoutes(app: FastifyInstance) {
             data: rows,
         }
     });
-
 }
 
 export async function jwtTestRoute(app: FastifyInstance) {
     app.get("/jwt-test", async()=>{
         const token = app.jwt.sign({
-            sub: 1,
+            sub: 1, //subject (who the token belongs to)
             role: "student",
         });
         return {
@@ -24,6 +23,7 @@ export async function jwtTestRoute(app: FastifyInstance) {
         }
     });
 }
+
 export async function authenticateRoute(app: FastifyInstance) {
     app.get("/api/v1/me", { preHandler: [authenticate],},
         async(request)=>{

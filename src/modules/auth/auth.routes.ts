@@ -5,7 +5,7 @@ import { AppError } from "../../errors/app.error.ts";
 
 export async function authRoutes(app: FastifyInstance) {
     app.post("/api/v1/auth/register", {
-        schema: registerSchema,
+        schema: registerSchema, 
     }, async (request, reply) => {
         const user = await registerUser(
             app.db,
@@ -31,14 +31,12 @@ export async function authRoutes(app: FastifyInstance) {
                 password: string;
             }
         );
-        reply.setCookie(
-            "refreshToken",
-            result.refreshToken,
+        reply.setCookie("refreshToken", result.refreshToken,
             {
-                httpOnly: true,
-                path: "/",
-                sameSite: "strict",
-                secure: false,
+                httpOnly: true, //JS can't access the token
+                path: "/", //Cookie is available where (for entire website)
+                sameSite: "strict", //ONly from the requested user side 
+                secure: false, //Use the communincation for http if true for https
             }
         );
 

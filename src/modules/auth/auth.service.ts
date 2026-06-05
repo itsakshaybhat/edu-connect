@@ -8,7 +8,7 @@ import {
     generateAccessToken,
     generateRefreshToken,
 } from "./token.service.ts";
-
+ 
 interface UserRow extends RowDataPacket {
     id: number;
     email: string;

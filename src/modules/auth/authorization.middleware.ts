@@ -12,8 +12,8 @@ export function authorize(...allowedRoles: string[]) {
             throw new AppError(
                 401,
                 "Authentication required"
-            )
-        }
+            ) 
+        }   
         if (!allowedRoles.includes(user.role)) {
             throw new AppError(
                 403,

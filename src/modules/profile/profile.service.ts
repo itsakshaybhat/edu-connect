@@ -26,6 +26,7 @@ export async function getProfile(app:FastifyInstance,userId: number): Promise<Pr
         `,
         [userId]
     );
+    
     const user = users[0];
 
     if(!user) {

@@ -1,14 +1,16 @@
-import type{ FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 import { AppError } from "../../errors/app.error.ts";
 import { authenticate } from "../auth/auth.middleware.ts";
 import type { AuthUser } from "../auth/auth.types.ts";
 import { getProfile, updateProfile } from "./profile.service.ts";
 import { updateProfileSchema } from "./profile.schema.ts";
 
-export async function profileRoutes(app:FastifyInstance){
+export async function profileRoutes(
+    app: FastifyInstance
+) {
     app.get("/api/v1/profile", {
         preHandler: [authenticate],
-    },async (request)=>{
+    }, async (request) => {
         const user = request.user as AuthUser | null;
         const userId = user?.userId;
 
@@ -29,7 +31,7 @@ export async function profileRoutes(app:FastifyInstance){
     app.patch("/api/v1/profile", {
         preHandler: [authenticate],
         schema: updateProfileSchema,
-    },async (request)=>{
+    }, async (request) => {
         const body = request.body as {
             name: string;
         };
@@ -41,7 +43,7 @@ export async function profileRoutes(app:FastifyInstance){
         );
 
         return {
-            success:true,
+            success: true,
             data: profile,
         }
     })

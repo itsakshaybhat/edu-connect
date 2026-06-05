@@ -8,7 +8,7 @@ import type { AuthUser } from "../auth/auth.types.ts";
 
 
 export async function courseRoutes(
-    app: FastifyInstance
+    app: FastifyInstance,
 ) {
     app.post(
         "/api/v1/courses",
