@@ -36,7 +36,44 @@ export async function lessonRoutes(
         authenticate,
         authorize("instructor", "admin"),
       ],
-      schema: createLessonSchema,
+      schema: {
+        tags: ["Lessons"],
+        summary: "Create Lesson",
+        description: "Create a lesson for a course",
+        ...createLessonSchema,
+        security: [
+          {
+              bearerAuth: [],
+          }
+        ],
+        response: {
+          201: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              data: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  course_id: { type: "integer" },
+                  title: { type: "string" },
+                  content: { type: ["string", "null"] },
+                  lesson_order: { type: "integer" },
+                  created_at: { type: "string", format: "date-time" },
+                  updated_at: { type: "string", format: "date-time" },
+                },
+              },
+            },
+          },
+          409: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       const { id } =
@@ -66,7 +103,41 @@ export async function lessonRoutes(
 
   app.get(
     "/api/v1/courses/:id/lessons",
-    async (request) => {
+    {
+      schema: {
+        tags: ["Lessons"],
+        summary: "List Lessons",
+          response: {
+            200: {
+              type: "object",
+              properties: {
+                success: { type: "boolean" },
+                data: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "integer" },
+                      course_id: { type: "integer" },
+                      title: { type: "string" },
+                      content: { type: ["string", "null"] },
+                      lesson_order: { type: "integer" },
+                      created_at: { type: "string", format: "date-time" },
+                      updated_at: { type: "string", format: "date-time" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        description: "List lessons for a course",
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "integer", minimum: 1 } },
+        },
+      },
+    }, async (request) => {
       const { id } =
         request.params as {
           id: number;
@@ -92,6 +163,33 @@ export async function lessonRoutes(
         authenticate,
         authorize("instructor", "admin"),
       ],
+      schema: {
+        tags: ["Lessons"],
+        summary: "Delete Lesson",
+        description: "Delete a lesson by id",
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: { id: { type: "integer", minimum: 1 } },
+        },
+        security: [
+            {
+                bearerAuth: [],
+            }
+        ],
+        response: {
+          204: {
+            description: "No Content",
+          },
+          404: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
     },
     async (request, reply) => {
       const { id } =
@@ -121,7 +219,58 @@ export async function lessonRoutes(
         authenticate,
         authorize("instructor", "admin"),
       ],
-      schema: updateLessonSchema,
+      schema: {
+        tags: ["Lessons"],
+        summary: "Update Lesson",
+        description: "Update a lesson",
+        ...updateLessonSchema,
+        security: [
+            {
+                bearerAuth: [],
+            }
+        ],
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              data: {
+                type: "object",
+                properties: {
+                  id: { type: "integer" },
+                  course_id: { type: "integer" },
+                  title: { type: "string" },
+                  content: { type: ["string", "null"] },
+                  lesson_order: { type: "integer" },
+                  created_at: { type: "string", format: "date-time" },
+                  updated_at: { type: "string", format: "date-time" },
+                },
+              },
+            },
+          },
+          400: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              message: { type: "string" },
+            },
+          },
+          404: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              message: { type: "string" },
+            },
+          },
+          409: {
+            type: "object",
+            properties: {
+              success: { type: "boolean" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
     },
     async (request) => {
       const { id } = request.params as { id: number };

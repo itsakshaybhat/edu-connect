@@ -13,7 +13,38 @@ export async function enrollmentRoutes(
             preHandler:[
                 authenticate,
             ],
-            schema: enrollSchema,
+            schema: {
+                tags: ["Enrollment"],
+                summary: "Enroll in Course",
+                description: "Enroll the authenticated user in a course",
+                ...enrollSchema,
+                security: [
+                    {
+                        bearerAuth: [],
+                    }
+                ],
+                response: {
+                    201: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean" },
+                            data: {
+                                type: "object",
+                                properties: {
+                                    message: { type: "string" },
+                                },
+                            },
+                        },
+                    },
+                    409: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean" },
+                            message: { type: "string" },
+                        },
+                    },
+                },
+            },
         }, async (request, reply) =>{
             const { id }  = request.params as {id:number};
 

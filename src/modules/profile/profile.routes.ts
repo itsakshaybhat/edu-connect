@@ -11,6 +11,41 @@ export async function profileRoutes(
 ) {
     app.get("/api/v1/profile", {
         preHandler: [authenticate],
+        schema: {
+            tags: ["Profile"],
+            summary: "Get Profile",
+            description: "Get current authenticated user's profile",
+            security: [
+                {
+                    bearerAuth: [],
+                }
+            ],
+            response: {
+                200: {
+                    type: "object",
+                    properties: {
+                        success: { type: "boolean" },
+                        data: {
+                            type: "object",
+                            properties: {
+                                id: { type: "integer" },
+                                name: { type: "string" },
+                                email: { type: "string" },
+                                role: { type: "string" },
+                                createdAt: { type: "string", format: "date-time" },
+                            },
+                        },
+                    },
+                },
+                404: {
+                    type: "object",
+                    properties: {
+                        success: { type: "boolean" },
+                        message: { type: "string" },
+                    },
+                },
+            },
+        },
     }, async (request) => {
         const user = request.user as AuthUser | null;
         const userId = user?.userId;
@@ -31,7 +66,35 @@ export async function profileRoutes(
 
     app.patch("/api/v1/profile", {
         preHandler: [authenticate],
-        schema: updateProfileSchema,
+        schema: {
+            tags: ["Profile"],
+            summary: "Update Profile",
+            description: "Update current user's profile",
+            ...updateProfileSchema,
+            security: [
+                {
+                    bearerAuth: [],
+                }
+            ],
+            response: {
+                200: {
+                    type: "object",
+                    properties: {
+                        success: { type: "boolean" },
+                        data: {
+                            type: "object",
+                            properties: {
+                                id: { type: "integer" },
+                                name: { type: "string" },
+                                email: { type: "string" },
+                                role: { type: "string" },
+                                createdAt: { type: "string", format: "date-time" },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     }, async (request) => {
         const body = request.body as {
             name: string;
@@ -52,7 +115,40 @@ export async function profileRoutes(
     app.patch("/api/v1/profile/password", 
         { 
             preHandler: [authenticate],
-            schema:changePasswordSchema,
+            schema: {
+                tags: ["Profile"],
+                summary: "Change Password",
+                description: "Change current user's password",
+                ...changePasswordSchema,
+                security: [
+                {
+                    bearerAuth: [],
+                }
+            ],
+                response: {
+                    200: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean" },
+                            message: { type: "string" },
+                        },
+                    },
+                    400: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean" },
+                            message: { type: "string" },
+                        },
+                    },
+                    401: {
+                        type: "object",
+                        properties: {
+                            success: { type: "boolean" },
+                            message: { type: "string" },
+                        },
+                    },
+                },
+            },
         },
         async (request, reply) => {
             await changePassword(

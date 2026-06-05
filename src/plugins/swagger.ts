@@ -32,7 +32,8 @@ async function swaggerPlugin(app: FastifyInstance) {
     });
     await app.register(swaggerUI, {
         routePrefix: "/docs",
-    })
+    });
+    
 }
 
 export default fp(swaggerPlugin);
