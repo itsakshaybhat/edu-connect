@@ -35,15 +35,17 @@ export function buildApp() {
 // ];
 
 // plugins.forEach(plugin => app.register(plugin));
-
-    app.register(courseRoutes);
-    app.register(authenticateRoute);
-    app.register(jwtTestRoute);
     app.register(healthRoutes);
+    app.register(jwtTestRoute);
+    app.register(authenticateRoute);
+    app.register(authorizeMiddleware);
+
+
     app.register(profileRoutes);
     app.register(authRoutes);
     app.register(enrollmentRoutes);
-    app.register(authorizeMiddleware);
+    app.register(courseRoutes);
+
 
     return app;
 }
