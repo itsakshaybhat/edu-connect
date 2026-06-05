@@ -5,3 +5,8 @@ export interface ProfileResponse {
     role: string;
     createdAt: Date;
 };
+
+export interface ChangePasswordInput {
+    currentPassword: string;
+    newPassword: string;
+};

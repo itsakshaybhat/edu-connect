@@ -8,3 +8,24 @@ export const updateProfileSchema = {
         additionalProperties: false,
     }
 } as const;
+
+export const changePasswordSchema = {
+    body: {
+        type: "object",
+        required: [
+            "currentPassword",
+            "newPassword",
+        ],
+        properties: {
+            currentPassword: {
+                type: "string",
+                minLength: 8,
+            },
+            newPassword: {
+                type: "string",
+                minLength: 8,     
+            }
+        },
+        additionalProperties: false,
+    }
+} as const;

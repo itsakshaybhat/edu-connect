@@ -16,6 +16,8 @@ import { courseRoutes } from "./modules/courses/course.routes.ts";
 import { enrollmentRoutes } from "./modules/enrollment/enrollment.routes.ts";
 import { lessonRoutes } from "./modules/lessons/lesson.routes.ts";
 
+import swaggerPlugin from "./plugins/swagger.ts";
+// import swagger from "@fastify/swagger";
 
 
 export function buildApp() {
@@ -36,6 +38,9 @@ export function buildApp() {
 // ];
 
 // plugins.forEach(plugin => app.register(plugin));
+
+    app.register(swaggerPlugin);
+
     app.register(healthRoutes);
     app.register(jwtTestRoute);
     app.register(authenticateRoute);
@@ -48,6 +53,8 @@ export function buildApp() {
     app.register(courseRoutes);
     app.register(lessonRoutes);
 
+
+    // app.swagger();
 
     return app;
 }

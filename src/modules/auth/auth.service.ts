@@ -1,9 +1,8 @@
 import type { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
 import bcrypt from "bcrypt";
 import type { FastifyInstance } from "fastify";
-import type { RegisterUserInput } from "./auth.types.ts";
+import type { RegisterUserInput, AuthUser ,LoginUserInput} from "./auth.types.ts";
 import { AppError } from '../../errors/app.error.ts';
-import type { LoginUserInput } from "./auth.types.ts";
 import {
     generateAccessToken,
     generateRefreshToken,
@@ -190,18 +189,53 @@ export async function refreshAccessToken(
             "Invalid refresh token"
         )
     }
+
+    await app.db.execute<ResultSetHeader>(
+        `
+            DELETE FROM refresh_tokens
+            WHERE id = ?
+        `,
+        [storedToken.id]
+    )
+
+    const newRefreshToken = generateRefreshToken(
+        app,
+        user.id,
+    );
+
+    await app.db.execute<ResultSetHeader>(
+        `
+            INSERT INTO refresh_tokens
+            (
+                user_id,
+                token,
+                expires_at
+            )
+            VALUES
+            (
+                ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY)
+            )
+        `,
+        [
+            user.id,
+            newRefreshToken,
+        ]
+    );
+
+
     const accessToken = generateAccessToken(
         app,
         user.id,
-        user.role
+        user.role,
     );
 
     return {
         accessToken,
+        refreshToken: newRefreshToken,
     };
-
-
 }
+
+//I need transaction to make the database error free and work correctly.
 
 export async function logoutUser(
     app: FastifyInstance,
@@ -215,4 +249,18 @@ export async function logoutUser(
         [refreshToken]
 
     );
+}
+
+export async function logoutAllDevices(
+    app: FastifyInstance,
+    userId: number,
+) {
+    await app.db.execute<ResultSetHeader>(
+        `
+            DELETE FROM refresh_tokens
+            WHERE user_id = ?
+        `,
+        [userId]
+    );
+    
 }
