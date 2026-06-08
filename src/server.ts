@@ -6,7 +6,12 @@ import { checkDatabaseConnection } from './db/health.ts';
 
 const start = async () => {
     try {
-        await checkDatabaseConnection();
+        // Only check DB connection when DB_HOST is configured.
+        if (env.DB_HOST) {
+            await checkDatabaseConnection();
+        } else {
+            console.log("Skipping database connection check (DB_HOST not set)");
+        }
 
         const app = buildApp();
         await app.listen({ port: env.PORT })

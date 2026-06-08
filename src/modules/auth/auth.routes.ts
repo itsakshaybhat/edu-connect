@@ -4,6 +4,9 @@ import { registerUser, loginUser, refreshAccessToken, logoutUser, logoutAllDevic
 import { AppError } from "../../errors/app.error.ts";
 import { authenticate } from "./auth.middleware.ts";
 import type { AuthUser } from "./auth.types.ts";
+import { getGoogleAuthUrl, getGoogleUserFromCode, findOrCreateGoogleUser } from "./google-auth.service.ts";
+import { generateAccessToken, generateRefreshToken } from "./token.service.ts";
+import type { ResultSetHeader } from "mysql2/promise";
 
 export async function authRoutes(app: FastifyInstance) {
     app.post("/api/v1/auth/register", {
@@ -34,7 +37,7 @@ export async function authRoutes(app: FastifyInstance) {
                     },
                 },
             },
-            
+
         },
     }, async (request, reply) => {
         const user = await registerUser(
@@ -57,7 +60,7 @@ export async function authRoutes(app: FastifyInstance) {
             summary: "Login User",
             description: "Authenticate user and returns JWT tokens",
             ...loginSchema,
-            response : {
+            response: {
                 200: {
                     type: "object",
                     properties: {
@@ -67,14 +70,14 @@ export async function authRoutes(app: FastifyInstance) {
                         data: {
                             type: "object",
                             properties: {
-                                accessToken: {type: "string"},
-                                refreshToken: {type: "string"},
+                                accessToken: { type: "string" },
+                                refreshToken: { type: "string" },
                             },
                             additionalProperties: false,
                         }
                     },
                 },
-                401 : {
+                401: {
                     type: "object",
                     properties: {
                         success: {
@@ -113,7 +116,7 @@ export async function authRoutes(app: FastifyInstance) {
         }
     });
 
-    app.post("/api/v1/auth/refresh",{
+    app.post("/api/v1/auth/refresh", {
         schema: {
             tags: ["Auth"],
             summary: "Refresh Access Token",
@@ -162,7 +165,7 @@ export async function authRoutes(app: FastifyInstance) {
         }
     })
 
-    app.post("/api/v1/auth/logout",{
+    app.post("/api/v1/auth/logout", {
         schema: {
             tags: ["Auth"],
             summary: "Logout User",
@@ -187,7 +190,7 @@ export async function authRoutes(app: FastifyInstance) {
         }
     );
 
-    app.post("/api/v1/auth/logout-all",{
+    app.post("/api/v1/auth/logout-all", {
         schema: {
             tags: ["Auth"],
             summary: "Logout All Users from all devices",
@@ -199,7 +202,7 @@ export async function authRoutes(app: FastifyInstance) {
             },
         },
         preHandler: [authenticate],
-    },async (request, reply)=>{
+    }, async (request, reply) => {
         await logoutAllDevices(
             app,
             (request.user as AuthUser)!.userId,
@@ -208,5 +211,77 @@ export async function authRoutes(app: FastifyInstance) {
             path: "/",
         });
         return reply.status(204).send();
-    })
+    });
+
+    app.get(
+        "/api/v1/auth/google",
+        async (_, reply) => {
+            const url = getGoogleAuthUrl();
+
+            return reply.redirect(url);
+        }
+    );
+
+    app.get("/api/v1/auth/google/callback",
+        async (request,reply) => {
+            const { code } = request.query as {
+                code: string,
+            };
+
+            const googleUser = await getGoogleUserFromCode(code);
+            const user = await findOrCreateGoogleUser(
+                app,
+                googleUser
+            );
+
+            const accessToken = generateAccessToken(
+                app,
+                user.id,
+                user.role,
+            );
+            
+            const refreshToken = generateRefreshToken(
+                app,
+                user.id,
+            );
+            await app.db.execute<ResultSetHeader>(
+                `
+                    INSERT INTO refresh_tokens
+                    (
+                        user_id,
+                        token,
+                        expires_at
+                    )
+                    VALUES
+                    (?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY))
+                `,
+                [
+                    user.id,
+                    refreshToken,
+                ]
+            );
+
+            reply.setCookie(
+                "refreshToken",
+                refreshToken,
+                {
+                    httpOnly: true,
+                    sameSite: "strict",
+                    secure: false,
+                    path: "/",
+                }
+            );
+
+            return {
+                success: true,
+                data: {
+                    accessToken,
+                    refreshToken,
+                },
+            };
+            
+        }
+    );
 }
+
+

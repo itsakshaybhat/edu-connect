@@ -21,4 +21,4 @@ export function authorize(...allowedRoles: string[]) {
             );
         }
     };
-}
+};

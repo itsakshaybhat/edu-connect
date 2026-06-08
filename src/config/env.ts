@@ -18,4 +18,10 @@ export const env = {
 
     JWT_ACCESS_EXPIRES_IN: getEnv("JWT_ACCESS_EXPIRES_IN"),
     JWT_REFRESH_EXPIRES_IN: getEnv("JWT_REFRESH_EXPIRES_IN"),
+
+    googleClientId: getEnv("GOOGLE_CLIENT_ID"),
+    googleClientSecret: getEnv("GOOGLE_CLIENT_SECRET"),
+    googleRedirectUri: getEnv("GOOGLE_REDIRECT_URI"),
+
+
 };
