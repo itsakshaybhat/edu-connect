@@ -89,7 +89,7 @@ export async function findOrCreateGoogleUser(
 
     const existingOAuth = oauthAccounts[0];
 
-    if(existingOAuth){
+    if (existingOAuth) {
         const [users] = await app.db.query<UserRow[]>(
             `
                 SELECT 
@@ -104,6 +104,7 @@ export async function findOrCreateGoogleUser(
         );
         return users[0]!;
     }
+    //Above code checks whether the id is already in the table.
 
     const [usersByEmail] = await app.db.query<UserRow[]>(
         `
@@ -119,7 +120,7 @@ export async function findOrCreateGoogleUser(
 
     let user = usersByEmail[0];
 
-    if (!user){
+    if (!user) {
         const randomPassword = crypto.randomUUID();
         const passwordHash = await bcrypt.hash(
             randomPassword,
@@ -137,13 +138,14 @@ export async function findOrCreateGoogleUser(
                 ) 
                 VALUES (?, ?, ?, ?)
                 `,
-                [
-                    googleUser.name,
-                    googleUser.email,
-                    passwordHash,
-                    "student"
-                ]
+            [
+                googleUser.name,
+                googleUser.email,
+                passwordHash,
+                "student"
+            ]
         );
+        
         user = {
             id: result.insertId,
             email: googleUser.email,

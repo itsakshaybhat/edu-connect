@@ -223,7 +223,7 @@ export async function authRoutes(app: FastifyInstance) {
     );
 
     app.get("/api/v1/auth/google/callback",
-        async (request,reply) => {
+        async (request, reply) => {
             const { code } = request.query as {
                 code: string,
             };
@@ -239,11 +239,12 @@ export async function authRoutes(app: FastifyInstance) {
                 user.id,
                 user.role,
             );
-            
+
             const refreshToken = generateRefreshToken(
                 app,
                 user.id,
             );
+
             await app.db.execute<ResultSetHeader>(
                 `
                     INSERT INTO refresh_tokens
@@ -279,7 +280,6 @@ export async function authRoutes(app: FastifyInstance) {
                     refreshToken,
                 },
             };
-            
         }
     );
 }
