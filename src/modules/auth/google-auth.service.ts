@@ -5,6 +5,7 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 
 import { OAuth2Client } from "google-auth-library";
 import { env } from "../../config/env.ts";
+import { AppError } from "../../errors/app.error.ts";
 
 export const googleClient = new OAuth2Client(
     env.googleClientId,
@@ -72,6 +73,13 @@ export async function findOrCreateGoogleUser(
         emailVerified: boolean;
     }
 ): Promise<UserRow> {
+    if (!googleUser.emailVerified) {
+        throw new AppError(
+            401,
+            "Google email is not verified",
+        );
+    }
+
     const [oauthAccounts] = await app.db.query<OAuthAccountRow[]>(
         `
             SELECT 
