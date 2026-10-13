@@ -19,6 +19,7 @@ import { lessonRoutes } from "./modules/lessons/lesson.routes.ts";
 import swaggerPlugin from "./plugins/swagger.ts";
 // import swagger from "@fastify/swagger";
 
+import githubOAuthPlugin from "./plugins/github-oauth.ts";
 
 export function buildApp() {
     const app = Fastify({ logger: true });
@@ -28,6 +29,7 @@ export function buildApp() {
     app.register(jwtPlugin);
     app.register(authPlugin);
     app.register(errorHandlerPlugin);
+    app.register(githubOAuthPlugin);
 
 //  const plugins = [
 //     databasePlugin,

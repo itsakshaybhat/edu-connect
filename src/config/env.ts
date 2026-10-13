@@ -23,5 +23,7 @@ export const env = {
     googleClientSecret: getEnv("GOOGLE_CLIENT_SECRET"),
     googleRedirectUri: getEnv("GOOGLE_REDIRECT_URI"),
 
+    githubClientId: getEnv("GITHUB_CLIENT_ID"),
+    githubClientSecret: getEnv("GITHUB_CLIENT_SECRET"),
 
 };

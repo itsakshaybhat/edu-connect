@@ -282,6 +282,31 @@ export async function authRoutes(app: FastifyInstance) {
             };
         }
     );
+
+    app.get("/api/v1/auth/github/callback",
+        async (request, reply) => {
+            const token = await (app as any).githubOAuth2
+                .getAccessTokenFromAuthorizationCodeFlow(
+                    request
+                );
+            return {
+                success: true,
+                accessToken: token.token.access_token,
+            }
+        }
+    )
 }
+
+// GitHub Access Token
+//         ↓
+// Get GitHub User
+//         ↓
+// Find/Create User
+//         ↓
+// Generate EduConnect JWT
+//         ↓
+// Store Refresh Token
+//         ↓
+// Login Complete
 
 
