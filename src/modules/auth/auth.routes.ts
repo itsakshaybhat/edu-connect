@@ -8,6 +8,14 @@ import { getGoogleAuthUrl, getGoogleUserFromCode, findOrCreateGoogleUser } from 
 import { generateAccessToken, generateRefreshToken } from "./token.service.ts";
 import type { ResultSetHeader } from "mysql2/promise";
 
+const isProduction = process.env.NODE_ENV === "production";
+const refreshCookieOptions = {
+    httpOnly: true,
+    path: "/",
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
+} as const;
+
 export async function authRoutes(app: FastifyInstance) {
     app.post("/api/v1/auth/register", {
         schema: {
@@ -98,14 +106,7 @@ export async function authRoutes(app: FastifyInstance) {
                 password: string;
             }
         );
-        reply.setCookie("refreshToken", result.refreshToken,
-            {
-                httpOnly: true, //JS can't access the token
-                path: "/", //Cookie is available where (for entire website)
-                sameSite: "strict", //ONly from the requested user side 
-                secure: false, //Use the communincation for http if true for https
-            }
-        );
+        reply.setCookie("refreshToken", result.refreshToken, refreshCookieOptions);
 
         return {
             success: true,
@@ -262,16 +263,7 @@ export async function authRoutes(app: FastifyInstance) {
                 ]
             );
 
-            reply.setCookie(
-                "refreshToken",
-                refreshToken,
-                {
-                    httpOnly: true,
-                    sameSite: "strict",
-                    secure: false,
-                    path: "/",
-                }
-            );
+            reply.setCookie("refreshToken", refreshToken, refreshCookieOptions);
 
             return {
                 success: true,
